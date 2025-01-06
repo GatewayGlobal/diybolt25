@@ -4,12 +4,18 @@ import { useForm } from '@mantine/form'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createMaintenanceRecord } from '../../lib/api/maintenance'
 import { getVehicles } from '../../lib/api/vehicles'
+import { getCompanies } from '../../lib/api/companies'
 
 export default function MaintenanceForm({ onClose }) {
   const queryClient = useQueryClient()
   const { data: vehicles } = useQuery({
     queryKey: ['vehicles'],
     queryFn: getVehicles
+  })
+
+  const { data: companies } = useQuery({
+    queryKey: ['companies'],
+    queryFn: getCompanies
   })
 
   const form = useForm({
@@ -36,14 +42,31 @@ export default function MaintenanceForm({ onClose }) {
     onSuccess: () => {
       queryClient.invalidateQueries(['maintenance'])
       onClose()
+    },
+    onError: (error) => {
+      console.error('Error creating maintenance record:', error)
+      // You might want to show this error to the user through a notification system
     }
   })
 
   const handleSubmit = (values) => {
-    mutation.mutate({
+    // Get the first available company ID
+    const company_id = companies?.[0]?.id
+    if (!company_id) {
+      console.error('No company found')
+      return
+    }
+
+    // Format dates and add UUID
+    const formattedValues = {
       ...values,
-      company_id: '00000000-0000-0000-0000-000000000000' // Replace with actual company ID
-    })
+      id: crypto.randomUUID(),
+      company_id,
+      service_date: values.service_date?.toISOString(),
+      next_service_date: values.next_service_date?.toISOString()
+    }
+
+    mutation.mutate(formattedValues)
   }
 
   return (

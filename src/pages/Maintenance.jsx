@@ -26,6 +26,7 @@ export default function Maintenance() {
           <Table.Tr>
             <Table.Th>Vehicle</Table.Th>
             <Table.Th>Service Type</Table.Th>
+            <Table.Th>Description</Table.Th>
             <Table.Th>Service Date</Table.Th>
             <Table.Th>Cost</Table.Th>
             <Table.Th>Next Service</Table.Th>
@@ -36,8 +37,9 @@ export default function Maintenance() {
             <Table.Tr key={record.id}>
               <Table.Td>{`${record.vehicles?.make} ${record.vehicles?.model}`}</Table.Td>
               <Table.Td>{record.service_type}</Table.Td>
-              <Table.Td>{new Date(record.service_date).toLocaleDateString()}</Table.Td>
-              <Table.Td>${record.cost}</Table.Td>
+              <Table.Td>{record.description}</Table.Td>
+              <Table.Td>{record.service_date ? new Date(record.service_date).toLocaleDateString() : 'N/A'}</Table.Td>
+              <Table.Td>${record.cost?.toFixed(2) || '0.00'}</Table.Td>
               <Table.Td>{record.next_service_date ? new Date(record.next_service_date).toLocaleDateString() : 'N/A'}</Table.Td>
             </Table.Tr>
           ))}

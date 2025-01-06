@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { 
   IconDashboard, 
   IconCar, 
+  IconBuilding,
   IconUsers, 
   IconCalendar,
   IconTool,
@@ -17,6 +18,7 @@ export default function Sidebar() {
   const navLinks = [
     { label: 'Dashboard', icon: IconDashboard, path: '/' },
     { label: 'Vehicles', icon: IconCar, path: '/vehicles' },
+    { label: 'Companies', icon: IconBuilding, path: '/companies' },
     { label: 'Customers', icon: IconUsers, path: '/customers' },
     { label: 'Bookings', icon: IconCalendar, path: '/bookings' },
     { label: 'Maintenance', icon: IconTool, path: '/maintenance' },

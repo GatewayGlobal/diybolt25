@@ -35,10 +35,13 @@ export default function CustomerForm({ onClose }) {
   })
 
   const handleSubmit = (values) => {
-    mutation.mutate({
+    // Format the date to ISO string if it exists
+    const formattedValues = {
       ...values,
-      company_id: '00000000-0000-0000-0000-000000000000' // Replace with actual company ID
-    })
+      driver_license_expiry: values.driver_license_expiry ? values.driver_license_expiry.toISOString().split('T')[0] : null,
+      company_id: '8513aa82-d300-4fe0-b098-6f75e414fdaa'
+    }
+    mutation.mutate(formattedValues)
   }
 
   return (

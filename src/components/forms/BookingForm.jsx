@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createBooking } from '../../lib/api/bookings'
 import { getCustomers } from '../../lib/api/customers'
 import { getVehicles } from '../../lib/api/vehicles'
+import { getCompanies } from '../../lib/api/companies'
 
 export default function BookingForm({ onClose }) {
   const queryClient = useQueryClient()
@@ -16,6 +17,11 @@ export default function BookingForm({ onClose }) {
   const { data: vehicles } = useQuery({
     queryKey: ['vehicles'],
     queryFn: getVehicles
+  })
+
+  const { data: companies } = useQuery({
+    queryKey: ['companies'],
+    queryFn: getCompanies
   })
 
   const form = useForm({
@@ -45,14 +51,31 @@ export default function BookingForm({ onClose }) {
     onSuccess: () => {
       queryClient.invalidateQueries(['bookings'])
       onClose()
+    },
+    onError: (error) => {
+      console.error('Error creating booking:', error)
+      // You might want to show this error to the user through a notification system
     }
   })
 
   const handleSubmit = (values) => {
-    mutation.mutate({
+    // Get the first available company ID
+    const company_id = companies?.[0]?.id
+    if (!company_id) {
+      console.error('No company found')
+      return
+    }
+
+    // Convert dates to ISO strings and add UUID
+    const formattedValues = {
       ...values,
-      company_id: '00000000-0000-0000-0000-000000000000' // Replace with actual company ID
-    })
+      id: crypto.randomUUID(),
+      company_id,
+      start_date: values.start_date?.toISOString(),
+      end_date: values.end_date?.toISOString()
+    }
+
+    mutation.mutate(formattedValues)
   }
 
   return (

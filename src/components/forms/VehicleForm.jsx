@@ -1,8 +1,10 @@
 import { TextInput, NumberInput, Select, Button, Stack, Group } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
 import { useForm } from '@mantine/form'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { notifications } from '@mantine/notifications'
 import { createVehicle, updateVehicle } from '../../lib/api/vehicles'
+import { getCompanies } from '../../lib/api/companies'
 
 export default function VehicleForm({ onClose, initialData = null }) {
   const queryClient = useQueryClient()
@@ -20,13 +22,15 @@ export default function VehicleForm({ onClose, initialData = null }) {
       mileage: 0,
       fuel_type: '',
       insurance_expiry: null,
-      next_service_date: null
+      next_service_date: null,
+      company_id: ''
     },
     validate: {
       make: (value) => !value && 'Make is required',
       model: (value) => !value && 'Model is required',
       license_plate: (value) => !value && 'License plate is required',
-      vin: (value) => !value && 'VIN is required'
+      vin: (value) => !value && 'VIN is required',
+      company_id: (value) => !value && 'Company is required'
     }
   })
 
@@ -34,7 +38,19 @@ export default function VehicleForm({ onClose, initialData = null }) {
     mutationFn: createVehicle,
     onSuccess: () => {
       queryClient.invalidateQueries(['vehicles'])
+      notifications.show({
+        title: 'Success',
+        message: 'Vehicle added successfully',
+        color: 'green'
+      })
       onClose()
+    },
+    onError: (error) => {
+      notifications.show({
+        title: 'Error',
+        message: error.message || 'Failed to add vehicle',
+        color: 'red'
+      })
     }
   })
 
@@ -42,7 +58,19 @@ export default function VehicleForm({ onClose, initialData = null }) {
     mutationFn: updateVehicle,
     onSuccess: () => {
       queryClient.invalidateQueries(['vehicles'])
+      notifications.show({
+        title: 'Success',
+        message: 'Vehicle updated successfully',
+        color: 'green'
+      })
       onClose()
+    },
+    onError: (error) => {
+      notifications.show({
+        title: 'Error',
+        message: error.message || 'Failed to update vehicle',
+        color: 'red'
+      })
     }
   })
 
@@ -53,6 +81,18 @@ export default function VehicleForm({ onClose, initialData = null }) {
       createMutation.mutate(values)
     }
   }
+
+  // Fetch companies for the dropdown
+  const { data: companies = [] } = useQuery({
+    queryKey: ['companies'],
+    queryFn: getCompanies
+  })
+
+  // Transform companies data for the Select component
+  const companyOptions = companies.map(company => ({
+    value: company.id,
+    label: company.name
+  }))
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -81,6 +121,12 @@ export default function VehicleForm({ onClose, initialData = null }) {
         <DateInput
           label="Next Service Date"
           {...form.getInputProps('next_service_date')}
+        />
+        <Select
+          label="Company"
+          required
+          data={companyOptions}
+          {...form.getInputProps('company_id')}
         />
         <Group justify="flex-end">
           <Button variant="subtle" onClick={onClose}>Cancel</Button>

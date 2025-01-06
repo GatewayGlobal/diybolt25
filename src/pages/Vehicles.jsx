@@ -1,4 +1,5 @@
-import { Table, Group, Text, Modal, Button } from '@mantine/core'
+import { useState } from 'react'
+import { Table, Group, Text, Modal, Button, Loader, Center } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { notifications } from '@mantine/notifications'
@@ -12,7 +13,7 @@ export default function Vehicles() {
   const [selectedVehicle, setSelectedVehicle] = useState(null)
   const queryClient = useQueryClient()
 
-  const { data: vehicles, isLoading } = useQuery({
+  const { data: vehicles, isLoading, error } = useQuery({
     queryKey: ['vehicles'],
     queryFn: getVehicles
   })
@@ -45,7 +46,21 @@ export default function Vehicles() {
     }
   }
 
-  if (isLoading) return <Text>Loading...</Text>
+  if (isLoading) {
+    return (
+      <Center h={200}>
+        <Loader size="xl" />
+      </Center>
+    )
+  }
+
+  if (error) {
+    return (
+      <Center h={200}>
+        <Text c="red" size="lg">Error loading vehicles: {error.message}</Text>
+      </Center>
+    )
+  }
 
   return (
     <>
@@ -54,7 +69,7 @@ export default function Vehicles() {
         <AddButton onClick={handleAdd} label="Vehicle" />
       </Group>
       
-      <Table>
+      <Table highlightOnHover withTableBorder>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Make</Table.Th>
@@ -66,21 +81,31 @@ export default function Vehicles() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {vehicles?.map((vehicle) => (
-            <Table.Tr key={vehicle.id}>
-              <Table.Td>{vehicle.make}</Table.Td>
-              <Table.Td>{vehicle.model}</Table.Td>
-              <Table.Td>{vehicle.year}</Table.Td>
-              <Table.Td>{vehicle.license_plate}</Table.Td>
-              <Table.Td>{vehicle.status}</Table.Td>
-              <Table.Td>
-                <ActionButtons
-                  onEdit={() => handleEdit(vehicle)}
-                  onDelete={() => handleDelete(vehicle.id)}
-                />
+          {vehicles?.length === 0 ? (
+            <Table.Tr>
+              <Table.Td colSpan={6}>
+                <Center p="xl">
+                  <Text size="lg" c="dimmed">No vehicles found. Click the Add Vehicle button to create one.</Text>
+                </Center>
               </Table.Td>
             </Table.Tr>
-          ))}
+          ) : (
+            vehicles?.map((vehicle) => (
+              <Table.Tr key={vehicle.id}>
+                <Table.Td>{vehicle.make}</Table.Td>
+                <Table.Td>{vehicle.model}</Table.Td>
+                <Table.Td>{vehicle.year}</Table.Td>
+                <Table.Td>{vehicle.license_plate}</Table.Td>
+                <Table.Td>{vehicle.status}</Table.Td>
+                <Table.Td>
+                  <ActionButtons
+                    onEdit={() => handleEdit(vehicle)}
+                    onDelete={() => handleDelete(vehicle.id)}
+                  />
+                </Table.Td>
+              </Table.Tr>
+            ))
+          )}
         </Table.Tbody>
       </Table>
 
