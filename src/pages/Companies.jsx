@@ -82,12 +82,13 @@ export default function Companies() {
 
   return (
     <>
-      <Group justify="space-between" mb="md">
-        <Text size="xl" fw={700}>Companies</Text>
+      <Group justify="space-between" mb="md" wrap="nowrap">
+        <Text size="xl" fw={700} style={{ fontSize: 'clamp(1.25rem, 4vw, 1.5rem)' }}>Companies</Text>
         <AddButton onClick={handleAdd} label="Company" />
       </Group>
       
-      <Table highlightOnHover withTableBorder>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <Table highlightOnHover withTableBorder>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Name</Table.Th>
@@ -144,7 +145,8 @@ export default function Companies() {
             ))
           )}
         </Table.Tbody>
-      </Table>
+        </Table>
+      </div>
 
       <Modal 
         opened={opened} 

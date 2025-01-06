@@ -2,12 +2,13 @@ import { Select, NumberInput, TextInput, Button, Stack } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
 import { useForm } from '@mantine/form'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createBooking } from '../../lib/api/bookings'
+import { notifications } from '@mantine/notifications'
+import { createBooking, updateBooking } from '../../lib/api/bookings'
 import { getCustomers } from '../../lib/api/customers'
 import { getVehicles } from '../../lib/api/vehicles'
 import { getCompanies } from '../../lib/api/companies'
 
-export default function BookingForm({ onClose }) {
+export default function BookingForm({ onClose, initialData }) {
   const queryClient = useQueryClient()
   const { data: customers } = useQuery({
     queryKey: ['customers'],
@@ -25,7 +26,11 @@ export default function BookingForm({ onClose }) {
   })
 
   const form = useForm({
-    initialValues: {
+    initialValues: initialData ? {
+      ...initialData,
+      start_date: initialData.start_date ? new Date(initialData.start_date) : null,
+      end_date: initialData.end_date ? new Date(initialData.end_date) : null
+    } : {
       customer_id: '',
       vehicle_id: '',
       start_date: null,
@@ -46,36 +51,76 @@ export default function BookingForm({ onClose }) {
     }
   })
 
-  const mutation = useMutation({
+  const createMutation = useMutation({
     mutationFn: createBooking,
     onSuccess: () => {
       queryClient.invalidateQueries(['bookings'])
+      notifications.show({
+        title: 'Success',
+        message: 'Booking created successfully',
+        color: 'green'
+      })
       onClose()
     },
     onError: (error) => {
-      console.error('Error creating booking:', error)
-      // You might want to show this error to the user through a notification system
+      notifications.show({
+        title: 'Error',
+        message: error.message || 'Failed to create booking',
+        color: 'red'
+      })
+    }
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: updateBooking,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['bookings'])
+      notifications.show({
+        title: 'Success',
+        message: 'Booking updated successfully',
+        color: 'green'
+      })
+      onClose()
+    },
+    onError: (error) => {
+      notifications.show({
+        title: 'Error',
+        message: error.message || 'Failed to update booking',
+        color: 'red'
+      })
     }
   })
 
   const handleSubmit = (values) => {
-    // Get the first available company ID
-    const company_id = companies?.[0]?.id
+    // Get the first available company ID if not editing
+    const company_id = initialData?.company_id || companies?.[0]?.id
     if (!company_id) {
-      console.error('No company found')
+      notifications.show({
+        title: 'Error',
+        message: 'No company found',
+        color: 'red'
+      })
       return
     }
 
-    // Convert dates to ISO strings and add UUID
+    // Convert dates to ISO strings
     const formattedValues = {
       ...values,
-      id: crypto.randomUUID(),
       company_id,
       start_date: values.start_date?.toISOString(),
       end_date: values.end_date?.toISOString()
     }
 
-    mutation.mutate(formattedValues)
+    // Add UUID only for new bookings
+    if (!initialData) {
+      formattedValues.id = crypto.randomUUID()
+    }
+
+    if (initialData) {
+      updateMutation.mutate(formattedValues)
+    } else {
+      createMutation.mutate(formattedValues)
+    }
   }
 
   return (
@@ -121,7 +166,9 @@ export default function BookingForm({ onClose }) {
           label="Total Price"
           {...form.getInputProps('total_price')}
         />
-        <Button type="submit" loading={mutation.isPending}>Create Booking</Button>
+        <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
+          {initialData ? 'Update Booking' : 'Create Booking'}
+        </Button>
       </Stack>
     </form>
   )

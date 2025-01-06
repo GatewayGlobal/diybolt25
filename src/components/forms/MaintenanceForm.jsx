@@ -2,11 +2,12 @@ import { Select, NumberInput, TextInput, Button, Stack } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
 import { useForm } from '@mantine/form'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createMaintenanceRecord } from '../../lib/api/maintenance'
+import { notifications } from '@mantine/notifications'
+import { createMaintenanceRecord, updateMaintenanceRecord } from '../../lib/api/maintenance'
 import { getVehicles } from '../../lib/api/vehicles'
 import { getCompanies } from '../../lib/api/companies'
 
-export default function MaintenanceForm({ onClose }) {
+export default function MaintenanceForm({ onClose, initialData }) {
   const queryClient = useQueryClient()
   const { data: vehicles } = useQuery({
     queryKey: ['vehicles'],
@@ -19,7 +20,11 @@ export default function MaintenanceForm({ onClose }) {
   })
 
   const form = useForm({
-    initialValues: {
+    initialValues: initialData ? {
+      ...initialData,
+      service_date: initialData.service_date ? new Date(initialData.service_date) : null,
+      next_service_date: initialData.next_service_date ? new Date(initialData.next_service_date) : null
+    } : {
       vehicle_id: '',
       service_type: '',
       description: '',
@@ -37,36 +42,76 @@ export default function MaintenanceForm({ onClose }) {
     }
   })
 
-  const mutation = useMutation({
+  const createMutation = useMutation({
     mutationFn: createMaintenanceRecord,
     onSuccess: () => {
       queryClient.invalidateQueries(['maintenance'])
+      notifications.show({
+        title: 'Success',
+        message: 'Maintenance record created successfully',
+        color: 'green'
+      })
       onClose()
     },
     onError: (error) => {
-      console.error('Error creating maintenance record:', error)
-      // You might want to show this error to the user through a notification system
+      notifications.show({
+        title: 'Error',
+        message: error.message || 'Failed to create maintenance record',
+        color: 'red'
+      })
+    }
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: updateMaintenanceRecord,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['maintenance'])
+      notifications.show({
+        title: 'Success',
+        message: 'Maintenance record updated successfully',
+        color: 'green'
+      })
+      onClose()
+    },
+    onError: (error) => {
+      notifications.show({
+        title: 'Error',
+        message: error.message || 'Failed to update maintenance record',
+        color: 'red'
+      })
     }
   })
 
   const handleSubmit = (values) => {
-    // Get the first available company ID
-    const company_id = companies?.[0]?.id
+    // Get the first available company ID if not editing
+    const company_id = initialData?.company_id || companies?.[0]?.id
     if (!company_id) {
-      console.error('No company found')
+      notifications.show({
+        title: 'Error',
+        message: 'No company found',
+        color: 'red'
+      })
       return
     }
 
-    // Format dates and add UUID
+    // Format dates
     const formattedValues = {
       ...values,
-      id: crypto.randomUUID(),
       company_id,
       service_date: values.service_date?.toISOString(),
       next_service_date: values.next_service_date?.toISOString()
     }
 
-    mutation.mutate(formattedValues)
+    // Add UUID only for new records
+    if (!initialData) {
+      formattedValues.id = crypto.randomUUID()
+    }
+
+    if (initialData) {
+      updateMutation.mutate(formattedValues)
+    } else {
+      createMutation.mutate(formattedValues)
+    }
   }
 
   return (
@@ -115,7 +160,9 @@ export default function MaintenanceForm({ onClose }) {
           label="Next Service Date"
           {...form.getInputProps('next_service_date')}
         />
-        <Button type="submit" loading={mutation.isPending}>Add Maintenance Record</Button>
+        <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
+          {initialData ? 'Update Maintenance Record' : 'Add Maintenance Record'}
+        </Button>
       </Stack>
     </form>
   )
