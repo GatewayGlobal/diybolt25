@@ -8,3 +8,40 @@ html, body, #root {
   background-color: #f8f9fa;
   min-height: 100vh;
 }
+
+/* Mobile responsive styles */
+@media (max-width: 48em) {
+  .mantine-Table-root {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mantine-Table-root table {
+    min-width: 800px;
+  }
+
+  /* Adjust padding for mobile */
+  .mantine-AppShell-main {
+    padding: 0.5rem !important;
+  }
+
+  /* Adjust modal size for mobile */
+  .mantine-Modal-content {
+    max-width: calc(100vw - 2rem) !important;
+    margin: 1rem;
+  }
+}
+
+/* Ensure buttons and inputs are touch-friendly on mobile */
+@media (max-width: 48em) {
+  .mantine-Button-root,
+  .mantine-TextInput-input,
+  .mantine-Select-input {
+    min-height: 42px;
+  }
+
+  .mantine-ActionIcon-root {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}

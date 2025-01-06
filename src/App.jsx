@@ -26,10 +26,10 @@ function Header({ opened, toggle }) {
     <Group h="100%" px="md" justify="space-between">
       <Group>
         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-        <Title order={3}>Rental Management System</Title>
+        <Title order={3} style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)' }}>Rental Management System</Title>
       </Group>
       {user && (
-        <Button variant="subtle" onClick={handleSignOut}>
+        <Button variant="subtle" onClick={handleSignOut} visibleFrom="sm">
           Sign Out
         </Button>
       )}
@@ -38,7 +38,7 @@ function Header({ opened, toggle }) {
 }
 
 function AppContent() {
-  const [opened, { toggle }] = useDisclosure()
+  const [opened, { toggle }] = useDisclosure(false)
   const { user } = useAuth()
   const location = useLocation()
   const isLoginPage = location.pathname === '/login'
@@ -55,7 +55,11 @@ function AppContent() {
   return (
     <AppShell
       padding="md"
-      navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      navbar={{ 
+        width: { base: 0, sm: 300 }, // Set base width to 0 for complete collapse on mobile
+        breakpoint: 'sm',
+        collapsed: { mobile: !opened }
+      }}
       header={{ height: 60 }}
     >
       <AppShell.Header>
@@ -64,7 +68,7 @@ function AppContent() {
 
       {user && (
         <AppShell.Navbar p="md">
-          <Sidebar />
+          <Sidebar onClose={toggle} />
         </AppShell.Navbar>
       )}
 

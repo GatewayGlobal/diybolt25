@@ -40,8 +40,8 @@ export default function Login() {
       if (error) throw error
       
       // Navigate to the page they tried to visit or home
-      const from = location.state?.from?.pathname || "/"
-      navigate(from, { replace: true })
+      // Always redirect to dashboard after login
+      navigate("/", { replace: true })
     } catch (error) {
       setError(error.message)
       setLoading(false)
@@ -57,17 +57,40 @@ export default function Login() {
         justifyContent: 'center',
         alignItems: 'center',
         background: 'linear-gradient(to right, #e9ecef, #f8f9fa)',
-        padding: 0
+        padding: '1rem'
       }}
     >
-      <Title order={1} mb="lg" fw={900}>
+      <Title 
+        order={1} 
+        mb="lg" 
+        fw={900} 
+        ta="center" 
+        style={{ fontSize: 'clamp(1.75rem, 5vw, 2.25rem)' }}
+      >
         Rental Management System
       </Title>
       
-      <Box w={420} style={{ margin: 0, position: 'relative' }}>
+      <Box style={{ 
+        width: '100%', 
+        maxWidth: '420px',
+        margin: 0,
+        position: 'relative'
+      }}>
         <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
-        <Paper withBorder shadow="md" p={30} radius="md" bg="white">
-          <Title order={2} ta="center" mb="md" fw={700}>
+        <Paper 
+          withBorder 
+          shadow="md" 
+          p={{ base: 20, sm: 30 }} 
+          radius="md" 
+          bg="white"
+        >
+          <Title 
+            order={2} 
+            ta="center" 
+            mb="md" 
+            fw={700}
+            style={{ fontSize: 'clamp(1.5rem, 4vw, 1.75rem)' }}
+          >
             Welcome Back
           </Title>
 

@@ -1,4 +1,4 @@
-import { NavLink, Stack, Text } from '@mantine/core'
+import { NavLink, Stack, Text, Button, Box } from '@mantine/core'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { 
   IconDashboard, 
@@ -8,12 +8,15 @@ import {
   IconCalendar,
   IconTool,
   IconFolder,
-  IconCreditCard
+  IconCreditCard,
+  IconLogout
 } from '@tabler/icons-react'
+import { useAuth } from '../lib/auth/AuthContext'
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const { signOut } = useAuth()
 
   const navLinks = [
     { label: 'Dashboard', icon: IconDashboard, path: '/' },
@@ -26,17 +29,41 @@ export default function Sidebar() {
     { label: 'Subscriptions', icon: IconCreditCard, path: '/subscriptions' }
   ]
 
+  const handleNavigation = (path) => {
+    navigate(path)
+    onClose?.()
+  }
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/login')
+  }
+
   return (
-    <Stack gap="xs" p="md">
-      {navLinks.map((link) => (
-        <NavLink
-          key={link.path}
-          active={location.pathname === link.path}
-          label={<Text size="sm">{link.label}</Text>}
-          leftSection={<link.icon size="1.2rem" stroke={1.5} />}
-          onClick={() => navigate(link.path)}
-        />
-      ))}
+    <Stack gap="xs" p="md" h="100%" style={{ position: 'relative' }}>
+      <Box style={{ flex: 1 }}>
+        {navLinks.map((link) => (
+          <NavLink
+            key={link.path}
+            active={location.pathname === link.path}
+            label={<Text size="sm">{link.label}</Text>}
+            leftSection={<link.icon size="1.2rem" stroke={1.5} />}
+            onClick={() => handleNavigation(link.path)}
+          />
+        ))}
+      </Box>
+      
+      {/* Sign out button - only visible on mobile */}
+      <Button
+        variant="subtle"
+        color="red"
+        leftSection={<IconLogout size="1.2rem" stroke={1.5} />}
+        onClick={handleSignOut}
+        hiddenFrom="sm"
+        fullWidth
+      >
+        Sign Out
+      </Button>
     </Stack>
   )
 }

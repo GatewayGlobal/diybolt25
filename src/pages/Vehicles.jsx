@@ -64,12 +64,13 @@ export default function Vehicles() {
 
   return (
     <>
-      <Group justify="space-between" mb="md">
-        <Text size="xl" fw={700}>Vehicles</Text>
+      <Group justify="space-between" mb="md" wrap="nowrap">
+        <Text size="xl" fw={700} style={{ fontSize: 'clamp(1.25rem, 4vw, 1.5rem)' }}>Vehicles</Text>
         <AddButton onClick={handleAdd} label="Vehicle" />
       </Group>
       
-      <Table highlightOnHover withTableBorder>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <Table highlightOnHover withTableBorder>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Make</Table.Th>
@@ -107,7 +108,8 @@ export default function Vehicles() {
             ))
           )}
         </Table.Tbody>
-      </Table>
+        </Table>
+      </div>
 
       <Modal 
         opened={opened} 
