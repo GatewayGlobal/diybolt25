@@ -12,7 +12,6 @@ import {
   IconLogout
 } from '@tabler/icons-react'
 import { useAuth } from '../lib/auth/AuthContext'
-import { notifications } from '@mantine/notifications'
 
 export default function Sidebar({ onClose }) {
   const navigate = useNavigate()
@@ -44,8 +43,19 @@ export default function Sidebar({ onClose }) {
   }
 
   return (
-    <Stack gap="xs" p="md" h="100%" style={{ position: 'relative' }}>
-      <Box style={{ flex: 1 }}>
+    <div style={{ 
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      backgroundColor: 'white',
+      position: 'relative'
+    }}>
+      <div style={{ 
+        flex: '1 1 auto',
+        overflowY: 'auto',
+        padding: '1rem',
+        paddingBottom: '70px'
+      }}>
         {navLinks.map((link) => (
           <NavLink
             key={link.path}
@@ -53,22 +63,34 @@ export default function Sidebar({ onClose }) {
             label={<Text size="sm">{link.label}</Text>}
             leftSection={<link.icon size="1.2rem" stroke={1.5} />}
             onClick={() => handleNavigation(link.path)}
+            style={{ marginBottom: '0.5rem' }}
           />
         ))}
-      </Box>
+      </div>
       
-      {/* Sign out button - only visible on mobile */}
-      <Button
-        variant="subtle"
-        color="red"
-        leftSection={<IconLogout size="1.2rem" stroke={1.5} />}
-        onClick={handleSignOut}
-        hiddenFrom="sm"
-        fullWidth
-        style={{ marginTop: 'auto' }}
-      >
-        Sign Out
-      </Button>
-    </Stack>
+      <div style={{ 
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        borderTop: '1px solid #eee',
+        backgroundColor: 'white'
+      }}>
+        <Button
+          variant="subtle"
+          color="red"
+          leftSection={<IconLogout size="1.2rem" stroke={1.5} />}
+          onClick={handleSignOut}
+          hiddenFrom="sm"
+          fullWidth
+          style={{ 
+            height: '60px',
+            borderRadius: 0
+          }}
+        >
+          Sign Out
+        </Button>
+      </div>
+    </div>
   )
 }

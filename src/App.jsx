@@ -27,7 +27,7 @@ function Header({ opened, toggle }) {
     <Group h="100%" px="md" justify="space-between">
       <Group>
         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-        <Title order={3} style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)' }}>Rental Management System</Title>
+        <Title order={3} style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)' }}>Gateway Fleet System</Title>
       </Group>
       {user && (
         <Button variant="subtle" onClick={handleSignOut} visibleFrom="sm">
@@ -64,7 +64,10 @@ function AppContent() {
       navbar={{ 
         width: { base: 270, sm: 300 },
         breakpoint: 'sm',
-        collapsed: { mobile: !opened }
+        collapsed: { mobile: !opened },
+        style: { 
+          padding: 0
+        }
       }}
       header={{ height: 60 }}
     >
@@ -73,7 +76,7 @@ function AppContent() {
       </AppShell.Header>
 
       {user && (
-        <AppShell.Navbar p="md">
+        <AppShell.Navbar>
           <Sidebar onClose={close} />
         </AppShell.Navbar>
       )}

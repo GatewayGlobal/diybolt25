@@ -67,7 +67,7 @@ export default function Login() {
         ta="center" 
         style={{ fontSize: 'clamp(1.75rem, 5vw, 2.25rem)' }}
       >
-        Rental Management System
+        Gateway Fleet System
       </Title>
       
       <Box style={{ 
