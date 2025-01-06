@@ -2,12 +2,16 @@ import { TextInput, Button, Stack } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
 import { useForm } from '@mantine/form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createCustomer } from '../../lib/api/customers'
+import { notifications } from '@mantine/notifications'
+import { createCustomer, updateCustomer } from '../../lib/api/customers'
 
-export default function CustomerForm({ onClose }) {
+export default function CustomerForm({ onClose, initialData }) {
   const queryClient = useQueryClient()
   const form = useForm({
-    initialValues: {
+    initialValues: initialData ? {
+      ...initialData,
+      driver_license_expiry: initialData.driver_license_expiry ? new Date(initialData.driver_license_expiry) : null
+    } : {
       first_name: '',
       last_name: '',
       email: '',
@@ -26,10 +30,28 @@ export default function CustomerForm({ onClose }) {
     }
   })
 
-  const mutation = useMutation({
+  const createMutation = useMutation({
     mutationFn: createCustomer,
     onSuccess: () => {
       queryClient.invalidateQueries(['customers'])
+      notifications.show({
+        title: 'Success',
+        message: 'Customer created successfully',
+        color: 'green'
+      })
+      onClose()
+    }
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: updateCustomer,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['customers'])
+      notifications.show({
+        title: 'Success',
+        message: 'Customer updated successfully',
+        color: 'green'
+      })
       onClose()
     }
   })
@@ -41,8 +63,15 @@ export default function CustomerForm({ onClose }) {
       driver_license_expiry: values.driver_license_expiry ? values.driver_license_expiry.toISOString().split('T')[0] : null,
       company_id: '8513aa82-d300-4fe0-b098-6f75e414fdaa'
     }
-    mutation.mutate(formattedValues)
+    
+    if (initialData) {
+      updateMutation.mutate(formattedValues)
+    } else {
+      createMutation.mutate(formattedValues)
+    }
   }
+
+  const isLoading = createMutation.isPending || updateMutation.isPending
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -59,8 +88,11 @@ export default function CustomerForm({ onClose }) {
         <DateInput
           label="Driver License Expiry"
           {...form.getInputProps('driver_license_expiry')}
+          clearable
         />
-        <Button type="submit" loading={mutation.isPending}>Add Customer</Button>
+        <Button type="submit" loading={isLoading}>
+          {initialData ? 'Update Customer' : 'Add Customer'}
+        </Button>
       </Stack>
     </form>
   )
