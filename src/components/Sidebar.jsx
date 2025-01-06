@@ -37,6 +37,7 @@ export default function Sidebar({ onClose }) {
   const handleSignOut = async () => {
     await signOut()
     navigate('/login')
+    onClose?.() // Close the sidebar after signing out
   }
 
   return (
@@ -61,6 +62,7 @@ export default function Sidebar({ onClose }) {
         onClick={handleSignOut}
         hiddenFrom="sm"
         fullWidth
+        style={{ marginTop: 'auto' }}
       >
         Sign Out
       </Button>
