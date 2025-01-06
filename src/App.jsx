@@ -1,3 +1,4 @@
+import React from 'react'
 import { AppShell, Burger, Group, Title, Button } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
@@ -38,10 +39,15 @@ function Header({ opened, toggle }) {
 }
 
 function AppContent() {
-  const [opened, { toggle }] = useDisclosure(false)
+  const [opened, { toggle, close }] = useDisclosure(false)
   const { user } = useAuth()
   const location = useLocation()
   const isLoginPage = location.pathname === '/login'
+
+  // Close sidebar when route changes
+  React.useEffect(() => {
+    close()
+  }, [location.pathname, close])
 
   // If on login page, render without AppShell
   if (isLoginPage) {
@@ -56,7 +62,7 @@ function AppContent() {
     <AppShell
       padding="md"
       navbar={{ 
-        width: { base: 0, sm: 300 }, // Set base width to 0 for complete collapse on mobile
+        width: { base: 270, sm: 300 },
         breakpoint: 'sm',
         collapsed: { mobile: !opened }
       }}
@@ -68,7 +74,7 @@ function AppContent() {
 
       {user && (
         <AppShell.Navbar p="md">
-          <Sidebar onClose={toggle} />
+          <Sidebar onClose={close} />
         </AppShell.Navbar>
       )}
 
