@@ -12,6 +12,7 @@ import {
   IconLogout
 } from '@tabler/icons-react'
 import { useAuth } from '../lib/auth/AuthContext'
+import { notifications } from '@mantine/notifications'
 
 export default function Sidebar({ onClose }) {
   const navigate = useNavigate()
@@ -35,9 +36,11 @@ export default function Sidebar({ onClose }) {
   }
 
   const handleSignOut = async () => {
-    await signOut()
-    navigate('/login')
-    onClose?.() // Close the sidebar after signing out
+    const { error } = await signOut()
+    if (!error) {
+      onClose?.()
+      navigate('/login', { replace: true })
+    }
   }
 
   return (
