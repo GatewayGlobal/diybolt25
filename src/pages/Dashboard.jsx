@@ -3,6 +3,7 @@ import { IconCar, IconUsers, IconCalendar } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { getVehicles } from '../lib/api/vehicles'
 import { getBookings } from '../lib/api/bookings'
+import { getCustomers } from '../lib/api/customers'
 
 export default function Dashboard() {
   const { data: vehicles } = useQuery({
@@ -15,6 +16,11 @@ export default function Dashboard() {
     queryFn: getBookings
   })
 
+  const { data: customers } = useQuery({
+    queryKey: ['customers'],
+    queryFn: getCustomers
+  })
+
   const stats = [
     {
       title: 'Total Vehicles',
@@ -24,13 +30,13 @@ export default function Dashboard() {
     },
     {
       title: 'Active Bookings',
-      value: bookings?.filter(b => b.status === 'active')?.length || 0,
+      value: bookings?.filter(b => b.status === 'confirmed')?.length || 0,
       icon: IconCalendar,
       color: 'green'
     },
     {
       title: 'Total Customers',
-      value: '---',
+      value: customers?.length || 0,
       icon: IconUsers,
       color: 'grape'
     }

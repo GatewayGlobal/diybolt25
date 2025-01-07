@@ -50,6 +50,12 @@ export default function BookingForm({ onClose, initialData }) {
       return_location: (value) => !value && 'Return location is required'
     }
   })
+  
+  const statusOptions = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'confirmed', label: 'Confirmed' },
+    { value: 'cancelled', label: 'Cancelled' },
+  ];
 
   const createMutation = useMutation({
     mutationFn: createBooking,
@@ -165,6 +171,11 @@ export default function BookingForm({ onClose, initialData }) {
         <NumberInput
           label="Total Price"
           {...form.getInputProps('total_price')}
+        />
+        <Select
+          label="Status"
+          data={statusOptions}
+          {...form.getInputProps('status')}
         />
         <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
           {initialData ? 'Update Booking' : 'Create Booking'}
