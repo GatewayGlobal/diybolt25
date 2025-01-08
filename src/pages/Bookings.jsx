@@ -77,6 +77,7 @@ export default function Bookings() {
               <Table.Th>Vehicle</Table.Th>
               <Table.Th>Start Date</Table.Th>
               <Table.Th>End Date</Table.Th>
+              <Table.Th>Days</Table.Th>
               <Table.Th>Status</Table.Th>
               <Table.Th>Total Price</Table.Th>
               <Table.Th>Actions</Table.Th>
@@ -85,7 +86,7 @@ export default function Bookings() {
           <Table.Tbody>
             {bookings?.length === 0 ? (
               <Table.Tr>
-                <Table.Td colSpan={7}>
+                <Table.Td colSpan={8}>
                   <Center p="xl">
                     <Text size="lg" c="dimmed">No bookings found. Click the Add Booking button to create one.</Text>
                   </Center>
@@ -98,6 +99,7 @@ export default function Bookings() {
                   <Table.Td>{`${booking.vehicles?.make} ${booking.vehicles?.model}`}</Table.Td>
                   <Table.Td>{new Date(booking.start_date).toLocaleDateString()}</Table.Td>
                   <Table.Td>{new Date(booking.end_date).toLocaleDateString()}</Table.Td>
+                  <Table.Td>{Math.ceil(Math.abs(new Date(booking.end_date) - new Date(booking.start_date)) / (1000 * 60 * 60 * 24))}</Table.Td>
                   <Table.Td>{booking.status}</Table.Td>
                   <Table.Td>${booking.total_price}</Table.Td>
                   <Table.Td>

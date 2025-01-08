@@ -11,19 +11,20 @@ export default function VehicleForm({ onClose, initialData = null }) {
   const isEditing = !!initialData
 
   const form = useForm({
-    initialValues: initialData || {
-      make: '',
-      model: '',
-      year: new Date().getFullYear(),
-      color: '',
-      license_plate: '',
-      vin: '',
-      status: 'available',
-      mileage: 0,
-      fuel_type: '',
-      insurance_expiry: null,
-      next_service_date: null,
-      company_id: ''
+    initialValues: {
+      make: initialData?.make || '',
+      model: initialData?.model || '',
+      year: initialData?.year || new Date().getFullYear(),
+      daily_rate: initialData?.daily_rate || 0,
+      color: initialData?.color || '',
+      license_plate: initialData?.license_plate || '',
+      vin: initialData?.vin || '',
+      status: initialData?.status || 'available',
+      mileage: initialData?.mileage || 0,
+      fuel_type: initialData?.fuel_type || '',
+      insurance_expiry: initialData?.insurance_expiry ? new Date(initialData.insurance_expiry) : null,
+      next_service_date: initialData?.next_service_date ? new Date(initialData.next_service_date) : null,
+      company_id: initialData?.company_id || ''
     },
     validate: {
       make: (value) => !value && 'Make is required',
@@ -75,10 +76,17 @@ export default function VehicleForm({ onClose, initialData = null }) {
   })
 
   const handleSubmit = (values) => {
+    // Ensure dates are properly converted to Date objects if they exist
+    const formattedValues = {
+      ...values,
+      insurance_expiry: values.insurance_expiry ? new Date(values.insurance_expiry) : null,
+      next_service_date: values.next_service_date ? new Date(values.next_service_date) : null
+    }
+
     if (isEditing) {
-      updateMutation.mutate({ id: initialData.id, ...values })
+      updateMutation.mutate({ id: initialData.id, ...formattedValues })
     } else {
-      createMutation.mutate(values)
+      createMutation.mutate(formattedValues)
     }
   }
 
@@ -100,6 +108,7 @@ export default function VehicleForm({ onClose, initialData = null }) {
         <TextInput label="Make" required {...form.getInputProps('make')} />
         <TextInput label="Model" required {...form.getInputProps('model')} />
         <NumberInput label="Year" required {...form.getInputProps('year')} />
+        <NumberInput label="Daily Rate" required {...form.getInputProps('daily_rate')} />
         <TextInput label="Color" {...form.getInputProps('color')} />
         <TextInput label="License Plate" required {...form.getInputProps('license_plate')} />
         <TextInput label="VIN" required {...form.getInputProps('vin')} />

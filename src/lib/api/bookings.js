@@ -38,6 +38,7 @@ export const updateBooking = async (booking) => {
       start_date: booking.start_date,
       end_date: booking.end_date,
       status: booking.status,
+      base_price: booking.base_price,
       total_price: booking.total_price
     })
     .eq('id', booking.id)

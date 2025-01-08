@@ -78,6 +78,7 @@ export default function Vehicles() {
             <Table.Th>Year</Table.Th>
             <Table.Th>License Plate</Table.Th>
             <Table.Th>Status</Table.Th>
+            <Table.Th>Daily Rate</Table.Th>
             <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -98,6 +99,7 @@ export default function Vehicles() {
                 <Table.Td>{vehicle.year}</Table.Td>
                 <Table.Td>{vehicle.license_plate}</Table.Td>
                 <Table.Td>{vehicle.status}</Table.Td>
+                <Table.Td>{vehicle.daily_rate}</Table.Td>
                 <Table.Td>
                   <ActionButtons
                     onEdit={() => handleEdit(vehicle)}
